@@ -1,0 +1,6 @@
+{
+  "name": "FORGE AI",
+  "description": "Your autonomous software engineering partner. Full-stack AI IDE with codebase intelligence, multi-file diffing, and isolated backend execution.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

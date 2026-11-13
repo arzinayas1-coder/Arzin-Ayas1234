@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-sans: "Plus Jakarta Sans", system-ui, -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+@layer base {
+  :root {
+    --forge-bg: #09090b;
+    --forge-sidebar: #0c0c0f;
+    --forge-editor: #101014;
+    --forge-panel: #121217;
+    --forge-elevated: #18181f;
+    --forge-border: #262630;
+    --forge-text: #f4f4f7;
+    --forge-secondary: #9999a5;
+    --forge-muted: #666672;
+    --forge-violet: #8b7cff;
+    --forge-cyan: #40d9ff;
+    --forge-success: #36d399;
+    --forge-warning: #fbbf24;
+    --forge-error: #fb7185;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+    font-family: var(--font-sans);
+    background-color: #09090b;
+    color: #f4f4f7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(153, 153, 165, 0.22) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: rgba(153, 153, 165, 0.2);
+    border-radius: 9999px;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(153, 153, 165, 0.4);
+  }
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes forge-shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.forge-skeleton {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.025) 25%,
+    rgba(139, 124, 255, 0.07) 50%,
+    rgba(255, 255, 255, 0.025) 75%
+  );
+  background-size: 200% 100%;
+  animation: forge-shimmer 1.8s infinite linear;
+}

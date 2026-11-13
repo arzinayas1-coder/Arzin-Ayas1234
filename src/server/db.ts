@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import type {
@@ -17,11 +18,24 @@ import type {
 } from '../shared/types.ts';
 import { decryptSecret, encryptSecret } from './crypto.ts';
 
-const DATA_DIR = path.resolve(process.cwd(), '.forge-data');
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+function resolveWritableDataDir(): string {
+  const preferred = path.resolve(process.cwd(), '.forge-data');
+  try {
+    if (!fs.existsSync(preferred)) {
+      fs.mkdirSync(preferred, { recursive: true });
+    }
+    fs.accessSync(preferred, fs.constants.W_OK | fs.constants.R_OK);
+    return preferred;
+  } catch {
+    const fallback = path.join(os.tmpdir(), 'forge-ai-data');
+    if (!fs.existsSync(fallback)) {
+      fs.mkdirSync(fallback, { recursive: true });
+    }
+    return fallback;
+  }
 }
 
+const DATA_DIR = resolveWritableDataDir();
 const DB_PATH = path.join(DATA_DIR, 'forge.db');
 
 export const db = new Database(DB_PATH);

@@ -277,6 +277,10 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({
   const imageInputRef = useRef<HTMLInputElement>(null);
 
   const contextPct = Math.min(100, Math.round((contextUsedTokens / maxContextTokens) * 100));
+  const runningToolCount = useMemo(
+    () => activeActivities.filter((item) => item.status === 'running').length,
+    [activeActivities]
+  );
 
   const filteredFiles = useMemo(() => {
     const q = fileFilter.trim().toLowerCase();
@@ -366,6 +370,31 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({
           </div>
         </div>
       </div>
+
+      {/* Smooth Indeterminate Streaming Progress Bar */}
+      <AnimatePresence initial={false}>
+        {isStreaming && (
+          <motion.div
+            key="agent-stream-progress"
+            initial={{ opacity: 0, scaleY: 0 }}
+            animate={{ opacity: 1, scaleY: 1 }}
+            exit={{ opacity: 0, scaleY: 0 }}
+            transition={{ duration: 0.16, ease: 'easeOut' }}
+            style={{ transformOrigin: 'top' }}
+            role="progressbar"
+            aria-label={
+              runningToolCount > 1
+                ? `Agent streaming response with ${runningToolCount} concurrent tools running`
+                : 'Agent streaming response in progress'
+            }
+            aria-busy="true"
+            className="relative h-[2px] w-full bg-[#18181F] overflow-hidden shrink-0"
+          >
+            <div className="forge-progress-primary absolute inset-y-0 left-0 w-full bg-gradient-to-r from-[#8B7CFF]/0 via-[#8B7CFF] to-[#40D9FF]" />
+            <div className="forge-progress-secondary absolute inset-y-0 left-0 w-full bg-gradient-to-r from-[#40D9FF]/0 via-[#40D9FF]/90 to-[#8B7CFF]/0" />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Engineering Stream */}
       <div className="flex-1 min-h-0 overflow-y-auto px-4 py-4 space-y-5">
@@ -485,7 +514,14 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({
           <div className="space-y-3">
             <div className="flex items-center justify-between text-[10.5px] font-mono text-[#40D9FF]">
               <span>FORGE · Running {activeMode} workflow…</span>
-              <Loader2 className="w-3.5 h-3.5 animate-spin" strokeWidth={2} />
+              <span className="inline-flex items-center gap-1.5 tabular-nums">
+                {runningToolCount > 0 && (
+                  <span className="text-[#8B7CFF]">
+                    {runningToolCount} {runningToolCount === 1 ? 'tool' : 'tools'} active
+                  </span>
+                )}
+                <Loader2 className="w-3.5 h-3.5 animate-spin" strokeWidth={2} />
+              </span>
             </div>
 
             <TimelineBlock stages={activeTimeline} activities={activeActivities} />

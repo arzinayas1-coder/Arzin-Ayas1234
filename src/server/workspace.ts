@@ -1,11 +1,26 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import type { FileTreeNode, SearchMatch } from '../shared/types.ts';
 
-const WORKSPACES_ROOT = path.resolve(process.cwd(), '.forge-workspaces');
-if (!fs.existsSync(WORKSPACES_ROOT)) {
-  fs.mkdirSync(WORKSPACES_ROOT, { recursive: true });
+function resolveWorkspacesRoot(): string {
+  const preferred = path.resolve(process.cwd(), '.forge-workspaces');
+  try {
+    if (!fs.existsSync(preferred)) {
+      fs.mkdirSync(preferred, { recursive: true });
+    }
+    fs.accessSync(preferred, fs.constants.W_OK | fs.constants.R_OK);
+    return preferred;
+  } catch {
+    const fallback = path.join(os.tmpdir(), 'forge-ai-workspaces');
+    if (!fs.existsSync(fallback)) {
+      fs.mkdirSync(fallback, { recursive: true });
+    }
+    return fallback;
+  }
 }
+
+const WORKSPACES_ROOT = resolveWorkspacesRoot();
 
 const IGNORED_DIRS = new Set(['node_modules', '.git', 'dist', 'build', '.next', '__pycache__', '.venv']);
 const MAX_READ_BYTES = 512 * 1024;

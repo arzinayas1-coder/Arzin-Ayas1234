@@ -4,7 +4,6 @@ import fs from 'node:fs';
 import path from 'node:path';
 import express, { type Request, type Response } from 'express';
 import { WebSocketServer } from 'ws';
-import { createServer as createViteServer } from 'vite';
 import {
   getOrCreateWorkspaceUser,
   requireAuth,
@@ -96,7 +95,11 @@ async function startServer() {
   app.use(express.json({ limit: '10mb' }));
 
   const defaultUser = getOrCreateWorkspaceUser();
-  await bootstrapDefaultProjectIfNeeded(defaultUser.id);
+  try {
+    await bootstrapDefaultProjectIfNeeded(defaultUser.id);
+  } catch (err) {
+    console.error('Warning: default project bootstrap failed:', err);
+  }
 
   // WebSocket server for real-time terminal streaming
   const wss = new WebSocketServer({ server, path: '/ws' });
@@ -122,7 +125,7 @@ async function startServer() {
   });
 
   // --- Health ---
-  app.get('/api/health', (_req, res) => {
+  app.get(['/api/health', '/healthz'], (_req, res) => {
     res.json({ status: 'ok', service: 'forge-ai' });
   });
 
@@ -670,8 +673,14 @@ async function startServer() {
     }
   });
 
+  // Unknown API routes should return JSON 404 rather than SPA HTML
+  app.use('/api', (_req, res) => {
+    res.status(404).json({ error: 'API route not found' });
+  });
+
   // --- Vite / Static Frontend Serving ---
   if (process.env.NODE_ENV !== 'production') {
+    const { createServer: createViteServer } = await import('vite');
     const vite = await createViteServer({
       server: { middlewareMode: true, hmr: false },
       appType: 'spa',

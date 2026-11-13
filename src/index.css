@@ -82,3 +82,41 @@
   background-size: 200% 100%;
   animation: forge-shimmer 1.8s infinite linear;
 }
+
+@keyframes forge-indeterminate-primary {
+  0% {
+    transform: translateX(-100%) scaleX(0.25);
+  }
+  45% {
+    transform: translateX(15%) scaleX(0.55);
+  }
+  100% {
+    transform: translateX(120%) scaleX(0.35);
+  }
+}
+
+@keyframes forge-indeterminate-secondary {
+  0% {
+    transform: translateX(-120%) scaleX(0.2);
+  }
+  60% {
+    transform: translateX(35%) scaleX(0.45);
+  }
+  100% {
+    transform: translateX(130%) scaleX(0.2);
+  }
+}
+
+.forge-progress-primary {
+  transform-origin: left center;
+  animation: forge-indeterminate-primary 1.55s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  will-change: transform;
+}
+
+.forge-progress-secondary {
+  transform-origin: left center;
+  animation: forge-indeterminate-secondary 1.55s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: 0.55s;
+  will-change: transform;
+}
+
